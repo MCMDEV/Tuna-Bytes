@@ -8,10 +8,11 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
 
 import java.lang.instrument.ClassFileTransformer;
-import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MixinsTransformer implements ClassFileTransformer {
 
@@ -29,7 +30,7 @@ public class MixinsTransformer implements ClassFileTransformer {
     }
 
     @Override
-    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
         ClassReader targetReader = new ClassReader(classfileBuffer);
         ClassNode targetNode = new ClassNode();
         targetReader.accept(targetNode, ClassReader.SKIP_FRAMES);
@@ -52,5 +53,11 @@ public class MixinsTransformer implements ClassFileTransformer {
         targetNode.accept(writer);
 
         return writer.toByteArray();
+    }
+
+    public Collection<String> getTargetClasses()    {
+        return config.getMixinEntries().stream()
+                .map(MixinEntry::getTargetClass)
+                .collect(Collectors.toSet());
     }
 }
