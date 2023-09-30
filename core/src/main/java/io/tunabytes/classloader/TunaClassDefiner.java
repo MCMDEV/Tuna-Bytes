@@ -73,6 +73,10 @@ public final class TunaClassDefiner {
     }
 
     public static boolean requiresNeighbor() {
-        return classDefiner.requiresNeighbor();
+        try {
+            return classDefiner.requiresNeighbor();
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
